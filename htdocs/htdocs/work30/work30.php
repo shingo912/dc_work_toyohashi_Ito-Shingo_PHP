@@ -3,10 +3,15 @@
     $login_user = 'xb513874_n6viv'; 
     $password = '851d112dd0';   
     $database = 'xb513874_n9opa';   
+
     $error_msg = [];
-    $insert;
-    $delete;
- ?>
+    $images = [];
+
+    $sql;
+    $result;
+    $img;
+
+?>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -15,65 +20,64 @@
 </head>
 <body>
     <?php 
-        // データベースへ接続
+        // --- 外部リンクボタン ---
+        echo "<a href='https://portfolio02.dc-itex.com/toyohashi/0006/work30/work30_gallery.php' target='_blank'>";
+        echo "<button type='button'>画像投稿ページへ</button>";
+        echo "</a>";
+        // --- データベース接続 ---
         $db = new mysqli($host, $login_user, $password, $database);
         if ($db->connect_error) {
-            echo $db->connect_error;
+            echo "接続エラー：" . $db->connect_error;
             exit();
+        }
+        $db->set_charset("utf8");
+
+        // --- トランザクション開始 ---
+        $db->begin_transaction();
+
+        $sql = "SELECT title , file_name, public_flg FROM image;";
+        $result = $db->query($sql);
+
+        if ($result) {
+            // --- データを配列に格納 ---
+            while ($row = $result->fetch_assoc()) {
+                $images[] = $row;
+            }
+            $result->free();
+
+            $db->commit(); // 正常終了
         } else {
-            $db->set_charset("utf8");
+            $error_msg[] = 'SELECT実行エラー: ' . $db->error;
+            $db->rollback();
         }
 
-        // フォームが送信されたとき
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $db->begin_transaction(); // トランザクション開始
+        $db->close();
 
-            if (isset($_POST['insert'])) {
-                // INSERT文の実行
-                $insert = "INSERT INTO product (
-                            product_id,
-                            product_code,
-                            product_name,
-                            price,
-                            category_id
-                        ) VALUES (
-                            21,
-                            1021,
-                            'エシャロット',
-                            200,
-                            1
-                        );";
-                if ($db->query($insert)) {
-                    echo "データを挿入しました。<br>";
-                } else {
-                    $error_msg[] = 'INSERT実行エラー [実行SQL] ' . $insert;
-                }
+        // --- 結果の表示 ---
+        if (!empty($error_msg)) {
+            echo '<p style="color:red;">エラーが発生しました：' . htmlspecialchars(implode(', ', $error_msg)) . '</p>';
+        } else {
+            echo "<h2>画像一覧</h2>";
+            echo "<div style='display:flex; flex-wrap:wrap; gap:10px;'>";
 
-            } elseif (isset($_POST['delete'])) {
-                // DELETE文の実行
-                $delete = "DELETE FROM product WHERE product_id = 21;";
-                if ($db->query($delete)) {
-                    echo "データを削除しました。<br>";
-                } else {
-                    $error_msg[] = 'DELETE実行エラー [実行SQL] ' . $delete;
+            foreach ($images as $img) {
+                // 公開フラグが1のものだけ表示
+                if ($img['public_flg'] == 1) {
+                    $file_path = "images/" . htmlspecialchars($img['file_name']); // 画像フォルダのパス
+                    // ファイルが存在するか確認
+                    if (file_exists($file_path)) {
+                        echo "<div>";
+                        echo "<img src='{$file_path}' alt='' width='150'><br>";
+                        echo htmlspecialchars($img['title']);
+                        echo "</div>";
+                    } else {
+                        echo "<div style='color:gray;'>ファイルが見つかりません: " . htmlspecialchars($img['file_name']) . "</div>";
+                    }
                 }
             }
 
-            // ✅ トランザクションの確定処理はここにまとめる
-            if (count($error_msg) == 0) {
-                $db->commit(); // 正常に終了したらコミット
-                echo "コミットしました。";
-            } else {
-                echo '更新が失敗しました。ロールバックします。'; 
-                $db->rollback(); // エラーが起きたらロールバック
-            }
+            echo "</div>";
         }
-
-        $db->close(); // 接続を閉じる
     ?>
-    <form method="post">
-        <input type="submit" name="insert" value="挿入">
-        <input type="submit" name="delete" value="削除">
-    </form>
 </body>
 </html>

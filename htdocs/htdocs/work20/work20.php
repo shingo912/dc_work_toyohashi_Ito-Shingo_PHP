@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // $_FILES['image']['tmp_name'] → 一時的に保存されたアップロードファイルの場所
         $tmpName = $_FILES['image']['tmp_name'];
 
-        // basename() → ファイル名部分だけを取り出す（ディレクトリを除去）
+        // basename() → ファイル名部分だけを取り出す（ディレクトリを除去） _FILES['image']['name'] はファイル名を取る
         $origName = basename($_FILES['image']['name']);
 
         // pathinfo( , PATHINFO_EXTENSION) → 拡張子を取得
