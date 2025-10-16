@@ -70,8 +70,8 @@
             $toggle_id = (int)$_POST['toggle_id'];
             $current_flg = (int)$_POST['current_flg'];
             $new_flg = ($current_flg === 1) ? 0 : 1; // 反転
-
-            $update = "UPDATE image SET public_flg = $new_flg WHERE image_id = $toggle_id";
+            $date = date("Y-m-d");
+            $update = "UPDATE image SET public_flg = $new_flg , update_date = '$date' WHERE image_id = $toggle_id";
             if ($db->query($update)) {
                 echo "<p style='color:green;'>表示状態を更新しました。</p>";
             } else {
