@@ -21,7 +21,7 @@
 <body>
     <?php 
         // --- 外部リンクボタン ---
-        echo "<a href='https://portfolio02.dc-itex.com/toyohashi/0006/work30/work30_gallery.php' target='_blank'>";
+        echo "<a href='https://portfolio02.dc-itex.com/toyohashi/0006/work30/work30_gallery.php'>";
         echo "<button type='button'>画像投稿ページへ</button>";
         echo "</a>";
         // --- データベース接続 ---
@@ -43,6 +43,7 @@
             while ($row = $result->fetch_assoc()) {
                 $images[] = $row;
             }
+            // --- メモリ開放 ---
             $result->free();
 
             $db->commit(); // 正常終了

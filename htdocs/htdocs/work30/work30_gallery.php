@@ -54,7 +54,7 @@
 
     <?php 
         // --- 外部リンクボタン ---
-        echo "<a href='https://portfolio02.dc-itex.com/toyohashi/0006/work30/work30.php' target='_blank'>";
+        echo "<a href='https://portfolio02.dc-itex.com/toyohashi/0006/work30/work30.php'>";
         echo "<button type='button'>画像一覧ページへ</button>";
         echo "</a>";
         // --- DB接続 ---
@@ -80,6 +80,7 @@
         }
 
         // --- 画像投稿処理 ---
+        // --- $_SERVER['REQUEST_METHOD'] === 'POST' HTTPリクエストの送信方法がPOSTかどうかを判定 ---
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['toggle_id'])) { 
             $title = trim($_POST['title'] ?? '');
             $ext = ''; // 初期化しておく
